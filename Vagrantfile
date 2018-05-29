@@ -1,8 +1,8 @@
 Vagrant.configure("2") do |config|
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "precise64"
-  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+  config.vm.box = "hashicorp/precise64"
+  #config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
   # Make it possible to use the SSH keys from the host
   config.ssh.forward_agent = true
@@ -23,16 +23,27 @@ Vagrant.configure("2") do |config|
    config.vm.network "forwarded_port", guest: 9200, host: 9200
 
   # Forward guest port 8080 to host port 8080 (for Kibana)
-   config.vm.network "forwarded_port", guest: 8080, host: 8080
+   config.vm.network "forwarded_port", guest: 8080, host: 9090
 
   # Forward guest port 8088 to host port 8088 (for YARN)
-   config.vm.network "forwarded_port", guest: 8088, host: 8088
+  config.vm.network "forwarded_port", guest: 8088, host: 9099
+
+  # Sync folder to host HOME directory
+  config.vm.synced_folder "/Users/jsifantu", "/vagrant_home"
 
   # Change some default options for better experience, up memory and change VM name
   config.vm.provider :virtualbox do |vb|
     # Sets VM name equal to the parent directory + millis when started
     vb.name = Dir.pwd().split("/")[-1] + "-" + Time.now.to_f.to_i.to_s
     vb.memory = 4096
+  end
+
+  # Change some default options for better experience, up memory and change VM name
+  config.vm.provider "vmware_fusion" do |vb|
+    # Sets VM name equal to the parent directory + millis when started
+    vb.gui = false
+    vb.name = Dir.pwd().split("/")[-1] + "-" + Time.now.to_f.to_i.to_s
+    vb.memory = "2048"
   end
 
   # Run the provision.sh file, which install Ansible on the guest VM
